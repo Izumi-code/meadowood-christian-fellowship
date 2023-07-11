@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <style>
+    /* Custom styles for the side panel */
+  .side-panel {
+    background-color: #333; /* Dark background color */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    height: 100vh; /* Extend sidebar to full height */
+    color: #fff; /* Text color for links */
+  }
+
+  .side-panel ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .side-panel li {
+    margin-bottom: 10px;
+  }
+
+  .side-panel a {
+    display: block;
+    padding: 10px;
+    color: #fff; /* Text color for links */
+    text-decoration: none;
+    transition: background-color 0.3s;
+    border-radius: 5px;
+  }
+
+  .side-panel a:hover {
+    background-color: #555; /* Darker background color on hover */
+  }
+
+    /* Custom styles for the navbar */
+    .navbar {
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      color: #333;
+      font-weight: bold;
+    }
+
+    /* Custom styles for the table */
+    .custom-table th,
+    .custom-table td {
+      vertical-align: middle;
+    }
+
+    .custom-table th:nth-child(1) {
+      width: 5%;
+    }
+
+    .custom-table th:nth-child(2) {
+      width: 20%;
+    }
+
+    .custom-table th:nth-child(3),
+    .custom-table th:nth-child(4),
+    .custom-table th:nth-child(5) {
+      width: 10%;
+    }
+
+    .custom-table th:nth-child(6),
+    .custom-table th:nth-child(7),
+    .custom-table th:nth-child(8) {
+      width: 15%;
+    }
+
+    .custom-table td button {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Side panel -->
+      <div class="col-lg-3 col-md-4">
+        <div class="side-panel">
+          <h5>Admin</h5>
+          <ul>
+            <li><a href="/adminview/adminRecord"><i class="fas fa-user"></i> Admin Records</a></li>
+            <li><a href="/adminview/userRecord"><i class="fas fa-users"></i> Church Member Records</a></li>
+            <li><a href="/adminview/events"><i class="fas fa-calendar-plus"></i> Add Event</a></li>
+            <li><a href="/adminview/eventList"><i class="fas fa-list"></i> Events List</a></li>
+            <li><a href="/adminview/createAnnouncement"><i class="fas fa-list"></i> Create Announcement</a></li>
+            <li><a href="/adminview/announcements"><i class="fas fa-list"></i> View Announcements</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="col-lg-9 col-md-8">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <div class="container-fluid">
+            <a class="navbar-brand" href="/adminview/admindashboard">Admin Dashboard | Announcements</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                  <a class="nav-link" href="/register">Create a User</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/adminview/adminProfile">Profile</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/logout">Logout</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div class="container mt-5">
+          <table class="table table-striped custom-table">
+            <thead class="table-dark">
+              <tr>
+                <th>Title</th>
+                <th>Content</th>
+                <th>Date Posted</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% let counter = 1 %>
+              <% const filteredAnnouncements = announcements || [] %>
+              <% if (filteredAnnouncements.length > 0) { %>
+                <% filteredAnnouncements.forEach(function(announcement) { %>
+                  <tr>
+                    <td><%= announcement.title %></td>
+                    <td><%= announcement.content %></td>
+                    <td><%= announcement.date.toISOString().slice(0, 10) %></td>
+                  </tr>
+                  <% counter++ %>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="6">No events found</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/js/bootstrap.bundle.min.js"></script>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

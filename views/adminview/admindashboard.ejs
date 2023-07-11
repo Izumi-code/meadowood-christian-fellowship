@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+
+  <style>
+    /* Custom styles for the side panel */
+    .side-panel {
+      background-color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      height: 100vh;
+      color: #fff;
+    }
+
+    .side-panel ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .side-panel li {
+      margin-bottom: 10px;
+    }
+
+    .side-panel a {
+      display: block;
+      padding: 10px;
+      color: #fff;
+      text-decoration: none;
+      transition: background-color 0.3s;
+      border-radius: 5px;
+    }
+
+    .side-panel a:hover {
+      background-color: #555;
+    }
+
+    /* Custom styles for the navbar */
+    .navbar {
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      color: #333;
+      font-weight: bold;
+    }
+
+    /* Custom styles for the table */
+    .custom-table th,
+    .custom-table td {
+      vertical-align: middle;
+    }
+
+    .custom-table th:nth-child(1) {
+      width: 5%;
+    }
+
+    .custom-table th:nth-child(2) {
+      width: 20%;
+    }
+
+    .custom-table th:nth-child(3),
+    .custom-table th:nth-child(4),
+    .custom-table th:nth-child(5) {
+      width: 10%;
+    }
+
+    .custom-table th:nth-child(6),
+    .custom-table th:nth-child(7),
+    .custom-table th:nth-child(8) {
+      width: 15%;
+    }
+
+    .custom-table td button {
+      margin-right: 5px;
+    }
+
+    .chart-container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background-color: #dddddd;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chart-container>div {
+      flex: 0 0 45%;
+      margin: 10px;
+    }
+
+    .chart-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Side panel -->
+      <div class="col-lg-3 col-md-4">
+        <div class="side-panel">
+          <h5>Admin</h5>
+          <ul>
+            <li><a href="/adminview/adminRecord"><i class="fas fa-user"></i> Admin Records</a></li>
+            <li><a href="/adminview/userRecord"><i class="fas fa-users"></i> Church Member Records</a></li>
+            <li><a href="/adminview/events"><i class="fas fa-calendar-plus"></i> Add Event</a></li>
+            <li><a href="/adminview/eventList"><i class="fas fa-list"></i> Events List</a></li>
+            <li><a href="/adminview/createAnnouncement"><i class="fas fa-list"></i> Create Announcement</a></li>
+            <li><a href="/adminview/announcements"><i class="fas fa-list"></i> View Announcements</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="col-lg-9 col-md-8">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <div class="container-fluid">
+            <a class="navbar-brand" href="/adminview/admindashboard">Admin Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                  <a class="nav-link" href="/register">Create a User</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/adminview/adminProfile">Profile</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/logout">Logout</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+        <h1>Welcome to Church Management Dashboard</h1>
+
+        <div class="chart-container">
+          <div class="col-lg-4 col-md-4">
+            <canvas id="userChart" width="400" height="400"></canvas>
+          </div>
+          <div class="col-lg-4 col-md-4">
+            <canvas id="genderChart" width="400" height="400"></canvas>
+          </div>
+          <div class="col-lg-4 col-md-4">
+            <canvas id="statusChart" width="400" height="400"></canvas>
+          </div>
+          <div class="col-lg-4 col-md-4">
+            <canvas id="donationChart" width="400" height="400"></canvas>
+          </div>
+          <div class="col-lg-4 col-md-4">
+            <canvas id="locationChart" width="400" height="400"></canvas>
+          </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            const chartData = JSON.parse('<%- chartData %>');
+            const genderLabels = JSON.parse('<%- genderLabels %>');
+            const genderData = JSON.parse('<%- genderData %>');
+            const statusLabels = JSON.parse('<%- statusLabels %>');
+            const statusData = JSON.parse('<%- statusData %>');
+            const locationLabels = JSON.parse('<%- locationLabels %>');
+            const locationData = JSON.parse('<%- locationData %>');
+            const labels = ['January', 'February', 'March', 'April', 'May', 'June'];
+            const data = [5400, 2690, 3600, 4900, 2200, 2020];
+
+            // User chart configuration
+            new Chart(document.getElementById('userChart'), {
+              type: 'pie',
+              data: chartData,
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: 'bottom'
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const label = context.label || '';
+                        const value = context.parsed && context.parsed.toFixed(0);
+                        const percentage = ((value / chartData.datasets[0].data.reduce((a, b) => a + b, 0)) * 100).toFixed(2) + '%';
+                        return label + ': ' + value + ' (' + percentage + ')';
+                      }
+                    }
+                  },
+                  title: {
+                    display: true,
+                    text: 'Total Users', // Add a title for the chart
+                    font: {
+                      size: 20 // Increase the font size
+                    }
+                  }
+                }
+              }
+            });
+
+
+            // Gender chart configuration
+            const genderChartData = {
+              labels: genderLabels,
+              datasets: [{
+                label: 'Gender',
+                data: genderData,
+                backgroundColor: ['#007bff', '#dc3545']
+              }]
+            };
+
+            new Chart(document.getElementById('genderChart'), {
+              type: 'bar',
+              data: genderChartData,
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    display: false // Hide the legend
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const label = context.label || '';
+                        const value = context.parsed && context.parsed.toFixed(0);
+                        const percentage = ((value / genderChartData.datasets[0].data.reduce((a, b) => a + b, 0)) * 100).toFixed(2) + '%';
+                        return label + ': ' + value + ' (' + percentage + ')';
+                      }
+                    }
+                  }
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      precision: 0,
+                      stepSize: 1,
+                      font: {
+                        size: 16 // Increase the font size
+                      }
+                    }
+                  },
+                  x: {
+                    title: {
+                      display: true,
+                      text: '', // Set an empty string as the x-axis title
+                      font: {
+                        size: 16 // Increase the font size
+                      }
+                    },
+                    ticks: {
+                      font: {
+                        size: 16 // Increase the font size
+                      }
+                    }
+                  }
+                },
+                plugins: {
+                  title: {
+                    display: true,
+                    text: 'Gender Distribution', // Add a title for the chart
+                    font: {
+                      size: 20 // Increase the font size
+                    }
+                  }
+                }
+              }
+            });
+
+            // Status chart configuration
+            const statusChartData = {
+              labels: statusLabels,
+              datasets: [{
+                label: 'Status',
+                data: statusData,
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#007bff', '#6c757d']
+              }]
+            };
+
+            new Chart(document.getElementById('statusChart'), {
+              type: 'doughnut',
+              data: statusChartData,
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: 'bottom'
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const label = context.label || '';
+                        const value = context.parsed && context.parsed.toFixed(0);
+                        const percentage = ((value / statusChartData.datasets[0].data.reduce((a, b) => a + b, 0)) * 100).toFixed(2) + '%';
+                        return label + ': ' + value + ' (' + percentage + ')';
+                      }
+                    }
+                  },
+                  title: {
+                    display: true,
+                    text: 'Marital Status Distribution', // Add a title for the chart
+                    font: {
+                      size: 20 // Increase the font size
+                    }
+                  }
+                }
+              }
+            });
+
+            // Donation chart configuration
+            new Chart(document.getElementById('donationChart'), {
+              type: 'bar',
+              data: {
+                labels: labels,
+                datasets: [{
+                  label: 'Donation Amount',
+                  data: data,
+                  backgroundColor: 'rgba(54, 162, 235, 1)',
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      callback: function (value) {
+                        return '₱' + value;
+                      },
+                      font: {
+                        size: 16 // Increase the font size
+                      }
+                    }
+                  },
+                  x: {
+                    title: {
+                      display: true,
+                      text: 'Month', // Add a title for the x-axis
+                      font: {
+                        size: 16 // Increase the font size
+                      }
+                    },
+                    ticks: {
+                      font: {
+                        size: 16 // Increase the font size
+                      }
+                    }
+                  }
+                },
+                plugins: {
+                  title: {
+                    display: true,
+                    text: 'Donation Amount per Month', // Add a title for the chart
+                    font: {
+                      size: 20 // Increase the font size
+                    }
+                  }
+                }
+              }
+            });
+
+            // Location chart configuration
+            new Chart(document.getElementById('locationChart'), {
+              type: 'bar',
+              data: {
+                labels: locationLabels,
+                datasets: [{
+                  label: 'Location',
+                  data: locationData,
+                  backgroundColor: 'rgba(75, 192, 192, 1)'
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      precision: 0,
+                      stepSize: 1,
+                      font: {
+                        size: 16 // Increase the font size
+                      }
+                    }
+                  },
+                  x: {
+                    title: {
+                      display: true,
+                      text: 'Location', // Add a title for the x-axis
+                      font: {
+                        size: 16 // Increase the font size
+                      }
+                    },
+                    ticks: {
+                      font: {
+                        size: 16 // Increase the font size
+                      }
+                    }
+                  }
+                },
+                plugins: {
+                  title: {
+                    display: true,
+                    text: 'User Distribution by Location', // Add a title for the chart
+                    font: {
+                      size: 30 // Increase the font size
+                    }
+                  }
+                }
+              }
+            });
+
+
+          });
+
+          // Function to resize the charts based on window resize
+          function resizeCharts() {
+            const chartContainer = document.querySelector('.chart-container');
+            const chartWidth = chartContainer.offsetWidth;
+
+            // Resize the user chart
+            const userChart = document.getElementById('userChart');
+            userChart.style.width = chartWidth / 2.5 + 'px';
+            userChart.style.height = chartWidth / 2.5 + 'px';
+
+            // Resize the gender chart
+            const genderChart = document.getElementById('genderChart');
+            genderChart.style.width = chartWidth / 2.5 + 'px';
+            genderChart.style.height = chartWidth / 2.5 + 'px';
+
+            // Resize the marital status chart
+            const statusChart = document.getElementById('maritalStatusChart');
+            maritalStatusChart.style.width = chartWidth / 2.5 + 'px';
+            maritalStatusChart.style.height = chartWidth / 2.5 + 'px';
+
+            // Resize the donation chart
+            const donationChart = document.getElementById('donationChart');
+            donationChart.style.width = chartWidth / 2.5 + 'px';
+            donationChart.style.height = chartWidth / 2.5 + 'px';
+          }
+
+          // Call the resizeCharts function on page load and window resize
+          window.addEventListener('load', resizeCharts);
+          window.addEventListener('resize', resizeCharts);
+        </script>
+
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/js/bootstrap.min.js"></script>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
